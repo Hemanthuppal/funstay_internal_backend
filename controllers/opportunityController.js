@@ -1,6 +1,96 @@
 const Opportunity = require('../models/opportunityModel');
 const Lead = require('../models/leadModel'); // To update lead status when creating an opportunity
 const db = require('../config/db');
+// exports.createOpportunity = (req, res) => {
+//   const {
+//     leadid,
+//     customerid, // Add customerid to the destructured request body
+//     destination,
+//     start_date,
+//     end_date,
+//     duration,
+//     adults_count,
+//     children_count,
+//     child_ages,
+//     approx_budget,
+//     assignee,
+//     notes,
+//     comments,
+//     reminder_setting,
+//   } = req.body;
+
+//   const opportunityData = [
+//     leadid,
+//     customerid, // Include customerid in the opportunityData array
+//     destination,
+//     start_date,
+//     end_date,
+//     duration,
+//     adults_count,
+//     children_count,
+//     child_ages,
+//     approx_budget,
+//     assignee,
+//     notes,
+//     comments,
+//     reminder_setting,
+//   ];
+
+//   // Start a transaction
+//   db.beginTransaction((err) => {
+//     if (err) {
+//       console.error('Error starting transaction:', err);
+//       return res.status(500).json({ message: 'Error starting transaction' });
+//     }
+
+//     // Insert opportunity
+//     Opportunity.createOpportunity(opportunityData, (err, result) => {
+//       if (err) {
+//         console.error('Error creating opportunity:', err);
+//         return db.rollback(() => {
+//           res.status(500).json({ message: 'Failed to create opportunity.' });
+//         });
+//       }
+
+//       // Update lead status to "opportunity" in addleads table
+//       Lead.updateLeadStatusOpp(leadid, 'opportunity', (err) => {
+//         if (err) {
+//           console.error('Error updating lead status:', err);
+//           return db.rollback(() => {
+//             res.status(500).json({ message: 'Failed to update lead status.' });
+//           });
+//         }
+
+//         // Update customer status to "existing" in customers table
+//         Opportunity.updateCustomerStatus(customerid, 'existing', (err) => {
+//           if (err) {
+//             console.error('Error updating customer status:', err);
+//             return db.rollback(() => {
+//               res.status(500).json({ message: 'Failed to update customer status.' });
+//             });
+//           }
+
+//           // Commit transaction
+//           db.commit((err) => {
+//             if (err) {
+//               console.error('Error committing transaction:', err);
+//               return db.rollback(() => {
+//                 res.status(500).json({ message: 'Failed to commit transaction.' });
+//               });
+//             }
+
+//             res.status(201).json({
+//               message: 'Opportunity created successfully, lead status updated, and customer status updated.',
+//               opportunityId: result.insertId,
+//             });
+//           });
+//         });
+//       });
+//     });
+//   });
+// };
+
+
 exports.createOpportunity = (req, res) => {
   const {
     leadid,
@@ -70,18 +160,31 @@ exports.createOpportunity = (req, res) => {
             });
           }
 
-          // Commit transaction
-          db.commit((err) => {
+          // Update opportunity statuses in the addleads table
+          const opportunityStatus1 = "In Progress";
+          const opportunityStatus2 = "Understood Requirement";
+
+          Lead.OpportunityStatuses(leadid, opportunityStatus1, opportunityStatus2, (err) => {
             if (err) {
-              console.error('Error committing transaction:', err);
+              console.error('Error updating opportunity statuses in addleads:', err);
               return db.rollback(() => {
-                res.status(500).json({ message: 'Failed to commit transaction.' });
+                res.status(500).json({ message: 'Failed to update opportunity statuses in addleads.' });
               });
             }
 
-            res.status(201).json({
-              message: 'Opportunity created successfully, lead status updated, and customer status updated.',
-              opportunityId: result.insertId,
+            // Commit transaction
+            db.commit((err) => {
+              if (err) {
+                console.error('Error committing transaction:', err);
+                return db.rollback(() => {
+                  res.status(500).json({ message: 'Failed to commit transaction.' });
+                });
+              }
+
+              res.status(201).json({
+                message: 'Opportunity created successfully, lead status updated, customer status updated, and opportunity statuses updated.',
+                opportunityId: result.insertId,
+              });
             });
           });
         });

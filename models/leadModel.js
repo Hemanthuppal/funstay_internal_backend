@@ -156,7 +156,14 @@ const Lead = {
     });
   },
   
-  
+  OpportunityStatuses: (leadid, status1, status2, callback) => {
+    const query = `
+      UPDATE addleads 
+      SET opportunity_status1 = ?, opportunity_status2 = ? 
+      WHERE leadid = ?
+    `;
+    db.query(query, [status1, status2, leadid], callback);
+  },
 
 
   

@@ -87,6 +87,8 @@ const Opportunity = {
   
     db.query(query, params, callback);
   },
+
+ 
 };
 
 
