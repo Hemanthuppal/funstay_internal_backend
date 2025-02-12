@@ -91,7 +91,7 @@ const getEmployeesByRole = async (role) => {
 //     });
 // };
 
-const updateEmployeeModel = (leadid, employeeName, employeeId, managerId, callback) => {
+const updateEmployeeModel = (leadid, employeeName, employeeId, managerId,userName, callback) => {
   if (!leadid || !employeeId || !employeeName || !managerId) {
       return callback(new Error('Missing required fields'));
   }
@@ -105,11 +105,11 @@ const updateEmployeeModel = (leadid, employeeName, employeeId, managerId, callba
       // Insert notification
       const notificationMessage = 'Manager assigned you a Lead';
       const insertNotificationQuery = `
-          INSERT INTO notifications (employeeId, managerid, message, createdAt, \`read\`)
-          VALUES (?, ?, ?, NOW(), 0)
+          INSERT INTO notifications (employeeId, managerid,name, message, createdAt, \`read\`)
+          VALUES (?, ?, ?, ?, NOW(), 0)
       `;
 
-      db.query(insertNotificationQuery, [employeeId, managerId, notificationMessage], (err2, insertResult) => {
+      db.query(insertNotificationQuery, [employeeId, managerId,userName, notificationMessage], (err2, insertResult) => {
           if (err2) {
               return callback(err2);
           }

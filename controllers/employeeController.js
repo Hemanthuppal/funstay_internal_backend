@@ -124,13 +124,13 @@ const getEmployeesByManagerId = (req, res) => {
 
 
 const assignLead = (req, res) => {
-  const { leadid, employeeName, employeeId, managerId } = req.body; // Ensure managerId is included
+  const { leadid, employeeName, employeeId, managerId, userName } = req.body; // Ensure managerId is included
 
   console.log("Received employee ID:", employeeId);
   console.log("Received employee Name:", employeeName);
-  console.log("Received Manager ID:", managerId); // Log managerId for debugging
+  console.log("Received Manager name:", userName); // Log managerId for debugging
 
-  updateEmployeeModel(leadid, employeeName, employeeId, managerId, (err, results) => {
+  updateEmployeeModel(leadid, employeeName, employeeId, managerId, userName, (err, results) => {
       if (err) {
           console.error('Error in updateEmployeeModel:', err);
           return res.status(500).json({ message: 'Error updating lead or inserting notification' });

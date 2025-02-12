@@ -21,6 +21,9 @@ exports.createLead = (req, res) => {
     assignedSalesName,
     assign_to_manager,
     managerid,
+    manager_id,
+    admin,
+    employee_id
   } = req.body;
 
   // Check if customer already exists
@@ -85,15 +88,15 @@ exports.createLead = (req, res) => {
 
         // --- Begin Notification Insertion ---
         // Parallel insertion of notification without disturbing the existing lead creation flow.
-        const notificationMessage = ' assigned you a Lead';
+        const notificationMessage = `${admin || ""} assigned you a Lead`;
         const insertNotificationQuery = `
-          INSERT INTO notifications (employeeId, managerid, message, createdAt, \`read\`)
-          VALUES (?, ?, ?, NOW(), 0)
+          INSERT INTO notifications (employeeId, managerid, name, message, createdAt, \`read\`)
+          VALUES (?, ?, ?, ?, NOW(), 0)
         `;
         // Use assignedSalesId as employeeId and managerid from req.body.
         db.query(
           insertNotificationQuery,
-          [assignedSalesId ? Number(assignedSalesId) : null, managerid ? Number(managerid) : null, notificationMessage],
+          [employee_id ? Number(employee_id) : null, manager_id ? Number(manager_id) : null, assign_to_manager ? assign_to_manager : null, notificationMessage],
           (notificationErr, notificationResult) => {
             if (notificationErr) {
               console.error("Error inserting notification:", notificationErr);
